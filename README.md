@@ -15,3 +15,4 @@ Based on: https://github.com/dotnet-architecture/eShopModernizing
 - modern/ — modernized Blazor application
 - tests/ — characterization and regression tests
 - benchmarks/ — performance and reliability tests
+- test readme
