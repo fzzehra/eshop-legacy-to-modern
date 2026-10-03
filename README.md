@@ -16,4 +16,4 @@ Based on: https://github.com/dotnet-architecture/eShopModernizing
 - tests/ — characterization and regression tests
 - benchmarks/ — performance and reliability tests
 - test readme
-- test readme
+
