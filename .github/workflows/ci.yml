@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore tests/Tests/Tests.csproj
+
+      - name: Build
+        run: dotnet build tests/Tests/Tests.csproj --no-restore --configuration Release
+
+      # Builds the Blazor app once it exists in modern/
+      - name: Build modern app
+        if: hashFiles('modern/**/*.csproj') != ''
+        run: |
+          for p in $(find modern -name '*.csproj'); do dotnet build "$p" --configuration Release; done
+
+      - name: Test
+        run: dotnet test tests/Tests/Tests.csproj --no-build --configuration Release --verbosity normal
