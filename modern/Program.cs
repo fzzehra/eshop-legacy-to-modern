@@ -1,10 +1,17 @@
 using EShop.Modern.Components;
+using EShop.Modern.Data;
+using EShop.Modern.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContext<CatalogDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDb")));
+builder.Services.AddScoped<ICatalogReadService, CatalogReadService>();
 
 var app = builder.Build();
 
