@@ -1,5 +1,4 @@
-# Legacy Uygulama – Davranış Dokümanı: Edit ve Delete
-
+# Legacy Uygulama – Davranış Dokümanı: 
 Kayıt tarihi: 16.10.2026 · Kaydeden: Fatma Zehra Anbar
 Ortam: `UseMockData=false` (LocalDB), Visual Studio 2022, IIS Express, Ctrl+F5 (hata ayıklayıcı olmadan)
 Başlangıç verisi: bkz. [seed-data.md](seed-data.md)
@@ -102,10 +101,10 @@ Aşağıdaki durumların hepsinde ASP.NET'in varsayılan **"Server Error in '/' 
 
 | Durum | Sonuç | Kaynak |
 |---|---|---|
-| `/Catalog/Delete/999` (olmayan ürün) | 💥 `NullReferenceException` | `Delete.aspx:10` – `productToDelete.PictureFileName` |
-| `/Catalog/Delete/abc` | 💥 `FormatException` | `Delete.aspx.cs:20` – `Convert.ToInt32(...)` |
-| Silinmiş ürünün onay sayfasında (tarayıcı geri tuşu ile önbellekten) DELETE | 💥 `NullReferenceException` | `Delete.aspx:10`. Postback'te `Page_Load` ürünü yeniden arar, bulamaz; silme koduna ulaşılmaz |
-| Silinmiş ürünün URL'si yeniden açılır (`/Catalog/Delete/12`) | 💥 `NullReferenceException` | `Delete.aspx:10` |
+| `/Catalog/Delete/999` (olmayan ürün) |  `NullReferenceException` | `Delete.aspx:10` – `productToDelete.PictureFileName` |
+| `/Catalog/Delete/abc` |  `FormatException` | `Delete.aspx.cs:20` – `Convert.ToInt32(...)` |
+| Silinmiş ürünün onay sayfasında (tarayıcı geri tuşu ile önbellekten) DELETE |  `NullReferenceException` | `Delete.aspx:10`. Postback'te `Page_Load` ürünü yeniden arar, bulamaz; silme koduna ulaşılmaz |
+| Silinmiş ürünün URL'si yeniden açılır (`/Catalog/Delete/12`) |  `NullReferenceException` | `Delete.aspx:10` |
 
 - Tarayıcı geri tuşuyla dönüldüğünde, silinmiş ürünün onay sayfası **önbellekten** hâlâ gösterilir.
 
@@ -125,3 +124,234 @@ Yeni sistemde aşağıdaki davranışlar **birebir korunacak mı**, yoksa **düz
 2. Name > 50 karakter → çökme mi, form doğrulama mesajı mı?
 3. "Showing 10 of N" sayım hatası
 4. Mock ve DB modları arasındaki fiyat biçimi farkı (testler DB moduna göre yazılmalı)
+
+---
+
+## 5. Product List
+
+Kayıt tarihi: 17.10.2026 · Kaydeden: Sinem  
+Ortam: `UseMockData=false` (LocalDB), Visual Studio 2022, IIS Express  
+Başlangıç verisi: bkz. [seed-data.md](seed-data.md)
+
+### 5.1 Erişim
+---
+- Ana adres: `/`
+- Birinci sayfa: `/Default/index/0/size/10`
+- İkinci sayfa: `/Default/index/1/size/10`
+- Sayfalama URL'sinde sayfa indeksi 0'dan başlar.
+
+### 5.2 Ekran
+
+Ürünler tablo biçiminde listelenir. Her ürün için aşağıdaki bilgiler gösterilir:
+
+| Alan | Açıklama |
+|---|---|
+| Picture | Ürün görseli |
+| Name | Ürün adı |
+| Description | Ürün açıklaması |
+| Brand | Marka |
+| Type | Ürün türü |
+| Price | `$` işareti ve iki ondalık basamak |
+| Picture name | Görsel dosya adı |
+| Stock | Stok miktarı |
+| Restock | Yeniden stoklama değeri |
+| Max stock | Maksimum stok değeri |
+
+Her satırda `Edit`, `Details` ve `Delete` bağlantıları bulunur. Listenin üstünde `CREATE NEW` düğmesi vardır.
+
+### 5.3 Normal akış ve sayfalama
+
+- Başlangıçta veritabanında 12 ürün bulunurken ilk sayfada 10 ürün gösterildi.
+- İkinci sayfada kalan 2 ürün gösterildi.
+- `Next` bağlantısı ikinci sayfaya geçiş yapar.
+- `Previous` bağlantısı birinci sayfaya döner.
+- Birinci sayfanın alt yazısı: `Showing 10 of 12 products - Page 1 - 2`
+- İkinci sayfanın alt yazısı: `Showing 10 of 12 products - Page 2 - 2`
+
+İkinci sayfada yalnızca 2 ürün bulunmasına rağmen `Showing 10` yazısı değişmez. Bu durum mevcut uygulamanın sayfalama gösterim hatasıdır.
+
+### 5.4 Sınır durumları
+
+| Durum | Gözlemlenen sonuç |
+|---|---|
+| Sayfa indeksi `0` | İlk 10 ürün gösterilir |
+| Sayfa indeksi `1` | Sonraki 2 ürün gösterilir |
+| Sayfa indeksi `99` | `No data was returned.` mesajı gösterilir |
+| Sayfa indeksi `99` | Alt yazı `Showing 10 of 12 products - Page 100 - 2` olur |
+| Sayfa indeksi `-1` | Test sırasında Visual Studio hata ayıklayıcısı sorgu yürütme noktasında durdu; tarayıcıda yükleme tamamlanmadı |
+
+Negatif sayfa indeksi için kesin HTTP yanıtı belirlenemediğinden bu durum yeniden doğrulanmalıdır.
+
+---
+
+## 6. Product Details
+
+### 6.1 Erişim
+
+- URL: `/Catalog/Details/{id}`
+- Örnek: `/Catalog/Details/1`
+- Liste sayfasındaki `Details` bağlantısıyla açılır.
+
+### 6.2 Ekran
+
+Ürün detay sayfasında solda ürün görseli, sağda ürün bilgileri bulunur.
+
+Gösterilen alanlar:
+
+- Name
+- Description
+- Brand
+- Type
+- Price
+- Picture name
+- Stock
+- Restock
+- Max stock
+
+Alanlar salt okunurdur. Sayfanın altında `Edit` ve `Back to list` bağlantıları bulunur.
+
+### 6.3 Normal akış
+
+`/Catalog/Details/1` adresi açıldığında `.NET Bot Black Hoodie` ürününün bilgileri görüntülendi.
+
+Örnek değerler:
+
+| Alan | Değer |
+|---|---|
+| Name | .NET Bot Black Hoodie |
+| Brand | .NET |
+| Type | T-Shirt |
+| Price | $19.50 |
+| Picture name | 1.png |
+| Stock | 100 |
+| Restock | 0 |
+| Max stock | 0 |
+
+`Edit` bağlantısı düzenleme ekranına, `Back to list` bağlantısı ürün listesine geçiş sağlar.
+
+### 6.4 Hata durumları
+
+| Durum | Sonuç |
+|---|---|
+| `/Catalog/Details/999` | `NullReferenceException` |
+| `/Catalog/Details/abc` | `FormatException` |
+
+**Olmayan ürün:** `product` nesnesi `null` olduğundan `Details.aspx` dosyasındaki ürün görseli oluşturulurken hata meydana gelir.
+
+**Geçersiz ID:** `Details.aspx.cs` dosyasında `Convert.ToInt32(Page.RouteData.Values["id"])` işlemi `FormatException` üretir.
+
+Bu hatalar kullanıcı dostu bir mesaj yerine uygulamanın hata ayıklama/hata ekranına yol açmaktadır.
+
+---
+
+## 7. Product Create
+
+### 7.1 Erişim
+
+- URL: `/Catalog/Create`
+- Liste sayfasındaki `CREATE NEW` düğmesiyle açılır.
+
+### 7.2 Ekran
+
+| Alan | Kontrol | Başlangıç durumu |
+|---|---|---|
+| Name | Metin kutusu | Boş |
+| Description | Metin kutusu | Boş |
+| Brand | Açılır liste | Azure |
+| Type | Açılır liste | Mug |
+| Price | Metin kutusu | `0.00` |
+| Picture name | Bilgilendirme metni | Görsel yükleme desteklenmiyor |
+| Stock | Metin kutusu | `0` |
+| Restock | Metin kutusu | `0` |
+| Max stock | Metin kutusu | `0` |
+
+Görsel alanında `Uploading images not allowed for this version.` mesajı gösterilir.
+
+Formun altında `[ CANCEL ]` (kırmızı) ve `[ CREATE ]` (yeşil) düğmeleri bulunur.
+
+### 7.3 Normal akış
+
+Geçerli verilerle `CREATE` düğmesine basıldığında:
+
+- Ürün veritabanına kaydedilir.
+- Kullanıcı doğrudan ürün listesinin birinci sayfasına yönlendirilir.
+- Başarı mesajı gösterilmez.
+- Yeni ürün, kayıt sayısına bağlı olarak ikinci sayfada görüntülenebilir.
+
+Başarılı test kaydı:
+
+| Alan | Değer |
+|---|---|
+| Name | Sinem Create Test |
+| Description | Create successful test |
+| Brand | Azure |
+| Type | Mug |
+| Price | 10.50 |
+| Picture name | dummy.png |
+| Stock | 5 |
+| Restock | 2 |
+| Max stock | 10 |
+
+`CANCEL` düğmesi kullanıldığında ürün oluşturulmaz ve kullanıcı birinci liste sayfasına döner.
+
+### 7.4 Doğrulama kuralları
+
+Hata mesajları ilgili alanın altında kırmızı gösterilir. Geçersiz değerler düzeltilene kadar kayıt gerçekleşmez.
+
+| Alan | Girilen değer | Sonuç |
+|---|---|---|
+| Name | Boş |  `The Name field is required.` |
+| Name | 50 karakter |  Ürün oluşturuldu |
+| Name | 51 karakter |  EF6 kayıt hatası |
+| Price | `-5` |  Reddedildi |
+| Price | `abc` |  Reddedildi |
+| Price | `1.999` |  Reddedildi |
+| Price | `1000001` |  Reddedildi |
+| Price | `0` |  Ürün oluşturuldu |
+| Price | `1000000` |  Ürün oluşturuldu |
+| Price | `12,50` |  Reddedildi |
+| Stock | `-1` |  Reddedildi |
+| Stock | `0` |  Kabul edildi |
+| Stock | `10000001` |  Reddedildi |
+| Stock | `10000000` |  Ürün oluşturuldu |
+| Restock | `-1` |  Reddedildi |
+| Max stock | `-1` |  Reddedildi |
+
+**Price hata mesajı:**
+
+`The Price must be a positive number with maximum two decimals between 0 and 1 million.`
+
+**Stock hata mesajı:**
+
+`The field Stock must be between 0 and 10 million.`
+
+**Restock hata mesajı:**
+
+`The field Restock must be between 0 and 10 million.`
+
+**Max stock hata mesajı:**
+
+`The field Max stock must be between 0 and 10 million.`
+
+### 7.5 Hata durumları ve önemli bulgular
+
+**Name uzunluk sınırı:** 51 karakterlik bir ürün adı girildiğinde istemci tarafında doğrulama mesajı gösterilmez. `CatalogService.cs` dosyasındaki `db.SaveChanges()` işleminde `DbEntityValidationException` meydana gelir.
+
+**Fiyat biçimi:** Create ekranında virgülle girilen `12,50` değeri reddedilmiştir. Bu durum Edit ekranındaki gözlemle farklılık göstermektedir.
+
+**Fiyat sınırları:** `0` ve `1000000` değerleri kabul edilmiştir; `1000001` reddedilmiştir.
+
+**Stok sınırları:** `0` ve `10000000` kabul edilmiştir; `-1` ve `10000001` reddedilmiştir.
+
+**Kayıt sonrası yönlendirme:** Başarılı kayıt sonrasında kullanıcı, ürünün bulunduğu sayfaya değil, birinci liste sayfasına yönlendirilir.
+
+---
+
+## 8. Modernizasyon sırasında değerlendirilmesi gereken noktalar
+1. Ürün listeleme ve sayfalama davranışı regresyon testleriyle korunmalı; hatalı sayfa sayacı ayrıca ele alınmalıdır.
+2. Geçersiz veya bulunamayan ürün ID'leri kullanıcı dostu biçimde yönetilmelidir.
+3. Name uzunluk sınırı veritabanına kayıt yapılmadan önce doğrulanmalıdır.
+4. Create ve Edit ekranlarındaki fiyat biçimi farklılığı için ortak bir kural belirlenmelidir.
+5. Başarılı Create işlemi, CANCEL davranışı ve kayıt sonrası yönlendirme yeni Blazor uygulamasında test edilmelidir.
+
+Bu maddeler mevcut sistemin gözlemlerinden türetilen önerilerdir; yeni uygulamanın kesin davranışları ekip kararıyla belirlenecektir.
