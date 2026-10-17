@@ -1,19 +1,23 @@
-﻿@inherits LayoutComponentBase
+﻿
+@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+    <header class="site-header">
+        <div class="header-container">
+            <a class="site-logo" href="/">eShop</a>
+            <NavMenu />
         </div>
+    </header>
 
-        <article class="content px-4">
+    <main class="main-content">
+        <div class="content-container">
             @Body
-        </article>
+        </div>
     </main>
+
+    <footer class="site-footer">
+        <p>&copy; @DateTime.Now.Year eShop. All rights reserved.</p>
+    </footer>
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
