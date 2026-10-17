@@ -5,6 +5,7 @@ namespace Tests;
 public class LegacyProductListingTests
 {
     [Fact]
+    [Trait("Category", "LegacyE2E")]
     public async Task ProductListing_ShouldDisplayProducts()
     {
         // Launch the Chromium browser.

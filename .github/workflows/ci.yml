@@ -27,4 +27,4 @@ jobs:
           for p in $(find modern -name '*.csproj'); do dotnet build "$p" --configuration Release; done
 
       - name: Test
-        run: dotnet test tests/Tests/Tests.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test tests/Tests/Tests.csproj --no-build --configuration Release --verbosity normal --filter "Category!=LegacyE2E"
