@@ -1,0 +1,27 @@
+﻿
+@inherits LayoutComponentBase
+
+<div class="page">
+    <header class="site-header">
+        <div class="header-container">
+            <a class="site-logo" href="/">eShop</a>
+            <NavMenu />
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-container">
+            @Body
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; @DateTime.Now.Year eShop. All rights reserved.</p>
+    </footer>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
