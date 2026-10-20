@@ -50,7 +50,8 @@ public class CatalogDbContext : DbContext
                 .HasMaxLength(50);
 
             builder.Property(i => i.Price)
-                .IsRequired();
+                .IsRequired()
+                .HasPrecision(18, 2);
 
             builder.Property(i => i.PictureFileName)
                 .IsRequired();
