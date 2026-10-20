@@ -147,3 +147,7 @@ Screenshots of the verified legacy functionality are stored in `docs/legacy-scre
 - [Product Delete](legacy-screens/05-product-delete.png)
 
 These screenshots document the existing behavior of the legacy application before functional modernization begins.
+
+## 8. Related Documentation
+
+For information about the original legacy source code, repository structure, license, and basic running instructions, see [Legacy Application README](../legacy/README.md).

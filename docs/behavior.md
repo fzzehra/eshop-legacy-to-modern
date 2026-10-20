@@ -1,4 +1,4 @@
-# Legacy Uygulama – Davranış Dokümanı: 
+# Legacy Uygulama – Davranış Dokümanı
 Kayıt tarihi: 16.10.2026 · Kaydeden: Fatma Zehra Anbar
 Ortam: `UseMockData=false` (LocalDB), Visual Studio 2022, IIS Express, Ctrl+F5 (hata ayıklayıcı olmadan)
 Başlangıç verisi: bkz. [seed-data.md](seed-data.md)
@@ -178,10 +178,7 @@ Her satırda `Edit`, `Details` ve `Delete` bağlantıları bulunur. Listenin üs
 | Sayfa indeksi `1` | Sonraki 2 ürün gösterilir |
 | Sayfa indeksi `99` | `No data was returned.` mesajı gösterilir |
 | Sayfa indeksi `99` | Alt yazı `Showing 10 of 12 products - Page 100 - 2` olur |
-| Sayfa indeksi `-1` | Test sırasında Visual Studio hata ayıklayıcısı sorgu yürütme noktasında durdu; tarayıcıda yükleme tamamlanmadı |
-
-Negatif sayfa indeksi için kesin HTTP yanıtı belirlenemediğinden bu durum yeniden doğrulanmalıdır.
-
+| Sayfa indeksi `-1` | `System.ArgumentException`: `Count must have a non-negative value. Parameter name: count`. `CatalogService.cs:26` satırında hata oluşur. Ctrl+F5 ile doğrulanmıştır. |
 ---
 
 ## 6. Product Details
@@ -337,7 +334,7 @@ Hata mesajları ilgili alanın altında kırmızı gösterilir. Geçersiz değer
 
 **Name uzunluk sınırı:** 51 karakterlik bir ürün adı girildiğinde istemci tarafında doğrulama mesajı gösterilmez. `CatalogService.cs` dosyasındaki `db.SaveChanges()` işleminde `DbEntityValidationException` meydana gelir.
 
-**Fiyat biçimi:** Create ekranında virgülle girilen `12,50` değeri reddedilmiştir. Bu durum Edit ekranındaki gözlemle farklılık göstermektedir.
+**Fiyat biçimi:** Create ekranında virgülle girilen `12,50` ve `12,5` değerleri reddedilmiştir. Tekrar yapılan testte `12,5` için `The Price must be a positive number with maximum two decimals between 0 and 1 million.` doğrulama mesajı gösterilmiştir. Edit ekranında ise `12,50` değerinin kabul edildiği raporlanmıştır. Bu farklılığın nedeni henüz belirlenmemiştir.
 
 **Fiyat sınırları:** `0` ve `1000000` değerleri kabul edilmiştir; `1000001` reddedilmiştir.
 
