@@ -35,5 +35,8 @@ Sorun devam ederse Paket Yöneticisi Konsolu'nda:
 `Update-Package Microsoft.CodeDom.Providers.DotNetCompilerPlatform -Reinstall`
 
 ## İlgili dokümanlar
+
+- [Ayrıntılı kurulum rehberi](../docs/setup-legacy.md)
 - [Başlangıç verisi](../docs/seed-data.md)
-- [Edit/Delete davranış dokümanı](../docs/behavior.md)
+- [Legacy uygulama davranış dokümanı](../docs/behavior.md)
+- [URL ve route dokümanı](../docs/routes.md)

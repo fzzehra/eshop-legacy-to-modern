@@ -27,7 +27,7 @@ Yerel adres: `http://localhost:50586`
 | URL | Gözlemlenen davranış |
 |---|---|
 | `/Default/index/99/size/10` | Boş liste ve `No data was returned.` mesajı |
-| `/Default/index/-1/size/10` | Hata ayıklayıcı sorgu yürütme sırasında durdu; kesin HTTP sonucu doğrulanmadı |
+| `/Default/index/-1/size/10` | `System.ArgumentException`: `Count must have a non-negative value. Parameter name: count`. `CatalogService.cs:26` (Ctrl+F5 ile doğrulandı). |
 | `/Catalog/Details/999` | `NullReferenceException` |
 | `/Catalog/Details/abc` | `FormatException` |
 | `/Catalog/Edit/999` | `NullReferenceException` |
