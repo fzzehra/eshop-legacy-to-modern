@@ -66,3 +66,16 @@ code modern
 ```
 
 With the C# Dev Kit extension installed, VS Code will offer to restore dependencies and provide debugging (F5) support.
+
+## Docker ile çalıştırma (uygulama + SQL Server)
+
+Mac'te SQL Server yalnızca Docker ile çalışır. Docker Desktop açıkken, reponun ana klasöründe:
+
+```bash
+docker compose up --build
+```
+
+- Uygulama: http://localhost:8080
+- `db/init.sql`, legacy şemasını ve 12 başlangıç ürününü oluşturur (bkz. [seed-data.md](seed-data.md)).
+- Apple Silicon Mac'te Docker Desktop → Settings → General → **Use Rosetta** açık olmalı.
+- Durdurmak için: `docker compose down` (veriyi de silmek için `docker compose down -v`).

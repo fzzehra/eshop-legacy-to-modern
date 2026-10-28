@@ -1,0 +1,38 @@
+# Runs the modern app with a SQL Server database seeded with the legacy data.
+#   docker compose up --build
+# App: http://localhost:8080
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64   # Apple Silicon: enable Rosetta in Docker Desktop
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-Local_Dev_Only_123}"
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" -b
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  db-init:
+    build: ./db
+    platform: linux/amd64
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-Local_Dev_Only_123}"
+    entrypoint: /opt/mssql-tools18/bin/sqlcmd -C -S sqlserver -U sa -P "${MSSQL_SA_PASSWORD:-Local_Dev_Only_123}" -i /init.sql -b
+    restart: "no"
+
+  modern:
+    build: ./modern
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      ConnectionStrings__CatalogDb: "Server=sqlserver,1433;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Local_Dev_Only_123};TrustServerCertificate=True;MultipleActiveResultSets=True"
+    ports:
+      - "8080:8080"

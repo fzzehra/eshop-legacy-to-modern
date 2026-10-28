@@ -22,16 +22,16 @@ public class ModernHomePageTests
 
         // Navigate to the modern app's home page.
         var baseUrl = Environment.GetEnvironmentVariable("MODERN_BASE_URL")
-                      ?? "http://localhost:5232";
+                      ?? "http://localhost:8080";
 
         var response = await page.GotoAsync(baseUrl.TrimEnd('/') + "/");
 
         // Verify that the page loaded successfully.
         Assert.NotNull(response);
         Assert.True(response.Ok, $"Home page returned HTTP {response.Status}.");
-        Assert.Equal("Home", await page.TitleAsync());
+        Assert.Equal("Catalog", await page.TitleAsync());
         Assert.True(
-            await page.Locator("h1").IsVisibleAsync(),
-            "The home page should display a heading.");
+            await page.GetByRole(AriaRole.Link, new() { Name = "Details", Exact = true }).CountAsync() > 0,
+            "The home page should list products.");
     }
 }

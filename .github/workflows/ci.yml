@@ -32,15 +32,14 @@ jobs:
       - name: Install Playwright browser
         run: pwsh tests/Tests/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
 
-      - name: Start modern app
-        run: |
-          dotnet run --project modern/EShop.Modern.csproj --no-build --configuration Release --urls http://localhost:5232 > modern.log 2>&1 &
-          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:5232/ && exit 0; sleep 1; done
-          cat modern.log; exit 1
-        env:
-          ASPNETCORE_ENVIRONMENT: Development
+      - name: Start modern app and database
+        run: docker compose up -d --build --wait
 
       - name: Playwright tests (modern app)
         run: dotnet test tests/Tests/Tests.csproj --no-build --configuration Release --verbosity normal --filter "Category=ModernE2E"
         env:
-          MODERN_BASE_URL: http://localhost:5232
+          MODERN_BASE_URL: http://localhost:8080
+
+      - name: Show container logs
+        if: failure()
+        run: docker compose logs
