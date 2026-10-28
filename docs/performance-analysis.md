@@ -107,7 +107,26 @@ These results suggest promising performance characteristics for the modern imple
 
 However, the results cannot establish that modernization alone caused the improvements because the applications differ in runtime, hosting configuration, and data access behavior.
 
-## 5. Limitations
+## 5. CPU and Memory Usage Comparison
+
+CPU and memory usage were monitored using Windows Performance Monitor (PerfMon) during the local performance testing process.
+
+The legacy application was monitored through the `iisexpress` process, while the modern application was monitored through the `EShop.Modern` process.
+
+| Metric | Legacy ASP.NET Web Forms | Modern Blazor |
+|---|---:|---:|
+| Average CPU usage | 1.81% | 0.84% |
+| Maximum CPU usage | 15.74% | 7.73% |
+| Average private memory | 253.03 MiB | 78.13 MiB |
+| Maximum private memory | 253.30 MiB | 80.07 MiB |
+
+The modern application showed approximately 53% lower average CPU usage and 69% lower average private memory consumption in the recorded samples.
+
+However, the monitoring sessions included both idle and load-testing periods, and the applications were tested under different hosting and data-access conditions. Therefore, these measurements should be interpreted as preliminary observations rather than definitive evidence of resource-efficiency improvements.
+
+The CPU measurements represent Windows per-process processor time, while the memory measurements represent private bytes rather than total physical RAM usage.
+
+## 6. Limitations
 
 - Tests were executed locally rather than in a production-like environment.
 - Legacy and Modern applications used different hosting environments: IIS Express and Kestrel.
@@ -118,20 +137,20 @@ However, the results cannot establish that modernization alone caused the improv
 - Only one run per catalog and product details scenario is documented.
 - The tests measured HTTP responses rather than complete browser rendering or Blazor interactive behavior.
 - Database-backed create, update, and delete operations were not measured.
-- Hardware utilization, memory consumption, and CPU usage were not recorded.
+- - CPU and memory usage were recorded using Windows Performance Monitor, but the monitoring periods included both idle and load-testing activity.
 - Results may vary because of caching, application warm-up, and local system activity.
 
-## 6. Next Steps
+## 7. Next Steps
 
 1. Repeat each scenario multiple times under controlled conditions.
 2. Use equivalent data sources and comparable datasets where possible.
 3. Evaluate performance at multiple virtual-user levels.
 4. Add browser-level tests for interactive Blazor operations.
 5. Evaluate CRUD operations using isolated test data and cleanup procedures.
-6. Monitor CPU, memory, and database performance during testing.
+6. Repeat CPU and memory monitoring with synchronized load-testing windows, and include database performance metrics.
 7. Consider production-like benchmarking to assess scalability.
 
-## 7. Conclusion
+## 8. Conclusion
 
 The k6 performance tests were completed successfully for both the legacy ASP.NET Web Forms application and the modern Blazor application.
 
@@ -148,3 +167,7 @@ All documented runs completed 150 HTTP requests without failures.
 Under the tested conditions, the modern catalog listing and product details pages showed lower HTTP response times than the legacy implementation.
 
 These results provide useful initial performance baselines and indicate potential benefits of modernization. Further testing with equivalent workloads, repeated measurements, and production-like environments is necessary before drawing definitive performance conclusions.
+
+CPU and memory usage were also monitored using Windows Performance Monitor. The recorded measurements showed lower average CPU usage (0.84% vs. 1.81%) and lower average private memory consumption (78.13 MiB vs. 253.03 MiB) for the modern application compared with the legacy application.
+
+However, these resource utilization measurements included both idle and load-testing periods. Differences in hosting environments, data sources, and monitoring durations limit direct comparability. Additional synchronized benchmarks are required to confirm whether these differences persist under equivalent workloads.
