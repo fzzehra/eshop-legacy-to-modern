@@ -1,4 +1,5 @@
 @page "/Catalog/Delete/{Id:int}"
+@using System.Globalization
 @using EShop.Modern.Models
 @using EShop.Modern.Services
 @inject ICatalogReadService ReadService
@@ -29,7 +30,7 @@
                 <dd>@_item.CatalogType?.Type</dd>
 
                 <dt>Price</dt>
-                <dd class="esh-price">@_item.Price.ToString("C")</dd>
+                <dd class="esh-price">@_item.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</dd>
 
                 <dt>Picture name</dt>
                 <dd>@_item.PictureFileName</dd>
