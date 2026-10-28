@@ -1,5 +1,115 @@
+@page "/"
 @page "/catalog"
+@page "/Default/index/{PageIndex:int}/size/{PageSize:int}"
+@using System.Globalization
+@using EShop.Modern.Models
+@using EShop.Modern.Services
+@inject ICatalogReadService ReadService
 
 <PageTitle>Catalog</PageTitle>
 
-<h1>Catalog</h1>
+<div class="esh-table">
+    <p class="esh-link-wrapper">
+        <a href="/Catalog/Create" class="btn esh-button esh-button-primary">Create New</a>
+    </p>
+
+    @if (_model is null)
+    {
+        <p>Loading...</p>
+    }
+    else if (_model.Data.Count == 0)
+    {
+        <table>
+            <tr>
+                <td>No data was returned.</td>
+            </tr>
+        </table>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr class="esh-table-header">
+                    <th></th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Brand</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Picture name</th>
+                    <th>Stock</th>
+                    <th>Restock</th>
+                    <th>Max stock</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in _model.Data)
+                {
+                    <tr>
+                        <td><img class="esh-thumbnail" src="@($"/Pics/{item.PictureFileName}")" alt="@item.Name" /></td>
+                        <td><p>@item.Name</p></td>
+                        <td><p>@item.Description</p></td>
+                        <td><p>@item.CatalogBrand?.Brand</p></td>
+                        <td><p>@item.CatalogType?.Type</p></td>
+                        <td><p><span class="esh-price">@item.Price.ToString("0.00", CultureInfo.InvariantCulture)</span></p></td>
+                        <td><p>@item.PictureFileName</p></td>
+                        <td><p>@item.AvailableStock</p></td>
+                        <td><p>@item.RestockThreshold</p></td>
+                        <td><p>@item.MaxStockThreshold</p></td>
+                        <td>
+                            <a href="@($"/Catalog/Edit/{item.Id}")" class="esh-table-link">Edit</a>
+                            |
+                            <a href="@($"/Catalog/Details/{item.Id}")" class="esh-table-link">Details</a>
+                            |
+                            <a href="@($"/Catalog/Delete/{item.Id}")" class="esh-table-link">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@if (_model is not null)
+{
+    <div class="esh-pager">
+        <div class="container">
+            <article class="esh-pager-wrapper row">
+                <nav>
+                    <a href="@PageUrl(_model.ActualPage - 1)"
+                       class="esh-pager-item esh-pager-item--navigable @(HasPrevious ? "" : "esh-pager-item--hidden")">Previous</a>
+
+                    @* Legacy always printed the page size here; show the real item count instead. *@
+                    <span class="esh-pager-item">Showing @_model.Data.Count of @_model.TotalItems products - Page @(_model.ActualPage + 1) - @_model.TotalPages</span>
+
+                    <a href="@PageUrl(_model.ActualPage + 1)"
+                       class="esh-pager-item esh-pager-item--navigable @(HasNext ? "" : "esh-pager-item--hidden")">Next</a>
+                </nav>
+            </article>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int? PageIndex { get; set; }
+
+    [Parameter]
+    public int? PageSize { get; set; }
+
+    private PaginatedItems<CatalogItem>? _model;
+
+    private bool HasPrevious => _model!.ActualPage > 0;
+
+    private bool HasNext => _model!.ActualPage < _model.TotalPages - 1;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _model = await ReadService.GetCatalogItemsPaginatedAsync(
+            PageSize ?? CatalogReadService.DefaultPageSize,
+            PageIndex ?? 0);
+    }
+
+    private string PageUrl(int index) => $"/Default/index/{index}/size/{_model!.ItemsPerPage}";
+}

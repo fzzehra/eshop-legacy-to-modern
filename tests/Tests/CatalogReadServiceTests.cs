@@ -85,4 +85,30 @@ public class CatalogReadServiceTests
 
         Assert.Null(item);
     }
+
+    [Fact]
+    public async Task GetCatalogItemsPaginatedAsync_ReturnsRequestedPage()
+    {
+        using var db = CreateContext();
+        var service = new CatalogReadService(db);
+
+        var page = await service.GetCatalogItemsPaginatedAsync(pageSize: 1, pageIndex: 1);
+
+        Assert.Equal(1, page.ActualPage);
+        Assert.Equal(2, page.TotalItems);
+        Assert.Equal(2, page.TotalPages);
+        Assert.Equal(2, Assert.Single(page.Data).Id);
+    }
+
+    [Fact]
+    public async Task GetCatalogItemsPaginatedAsync_TreatsNegativeIndexAsFirstPage()
+    {
+        using var db = CreateContext();
+        var service = new CatalogReadService(db);
+
+        var page = await service.GetCatalogItemsPaginatedAsync(pageSize: 10, pageIndex: -1);
+
+        Assert.Equal(0, page.ActualPage);
+        Assert.Equal(2, page.Data.Count);
+    }
 }
