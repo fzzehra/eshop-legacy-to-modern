@@ -1,0 +1,85 @@
+@page "/Catalog/Delete/{Id:int}"
+@using EShop.Modern.Models
+@using EShop.Modern.Services
+@inject ICatalogReadService ReadService
+@inject ICatalogService CatalogService
+@inject NavigationManager Navigation
+
+<PageTitle>Delete</PageTitle>
+
+@if (_item is not null)
+{
+    <h2 class="esh-body-title">Delete</h2>
+
+    <div class="container">
+        <h3>Are you sure you want to delete this?</h3>
+        <div class="row">
+            <img class="col-md-6 esh-picture" src="@($"/Pics/{_item.PictureFileName}")" alt="@_item.Name" />
+            <dl class="col-md-6 dl-horizontal">
+                <dt>Name</dt>
+                <dd>@_item.Name</dd>
+
+                <dt>Description</dt>
+                <dd>@_item.Description</dd>
+
+                <dt>Brand</dt>
+                <dd>@_item.CatalogBrand?.Brand</dd>
+
+                <dt>Type</dt>
+                <dd>@_item.CatalogType?.Type</dd>
+
+                <dt>Price</dt>
+                <dd class="esh-price">@_item.Price.ToString("C")</dd>
+
+                <dt>Picture name</dt>
+                <dd>@_item.PictureFileName</dd>
+
+                <dt>Stock</dt>
+                <dd>@_item.AvailableStock</dd>
+
+                <dt>Restock</dt>
+                <dd>@_item.RestockThreshold</dd>
+
+                <dt>Max stock</dt>
+                <dd>@_item.MaxStockThreshold</dd>
+
+                <dt></dt>
+                <dd class="text-right esh-button-actions">
+                    <button type="button" class="btn esh-button esh-button-secondary" @onclick="Cancel">[ Cancel ]</button>
+                    <button type="button" class="btn esh-button esh-button-primary" @onclick="HandleDeleteAsync">[ Delete ]</button>
+                </dd>
+            </dl>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    private CatalogItem? _item;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _item = await ReadService.GetCatalogItemByIdAsync(Id);
+
+        if (_item is null && HttpContext is not null)
+        {
+            HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+        }
+    }
+
+    private async Task HandleDeleteAsync()
+    {
+        await CatalogService.RemoveCatalogItemAsync(_item!);
+        Navigation.NavigateTo("/");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

@@ -1,0 +1,128 @@
+@page "/Catalog/Create"
+@using EShop.Modern.Models
+@using EShop.Modern.Services
+@inject ICatalogService CatalogService
+@inject NavigationManager Navigation
+
+<PageTitle>Create</PageTitle>
+
+<h2 class="esh-body-title">Create</h2>
+
+<div>
+    <EditForm Model="_item" OnValidSubmit="HandleCreateAsync" class="form-horizontal">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Name</label>
+            <div class="col-md-3">
+                <InputText @bind-Value="_item.Name" class="form-control" />
+                <ValidationMessage For="() => _item.Name" class="field-validation-valid text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Description</label>
+            <div class="col-md-3">
+                <InputText @bind-Value="_item.Description" class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Brand</label>
+            <div class="col-md-3">
+                <InputSelect @bind-Value="_item.CatalogBrandId" class="form-control">
+                    @foreach (var brand in _brands)
+                    {
+                        <option value="@brand.Id">@brand.Brand</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Type</label>
+            <div class="col-md-3">
+                <InputSelect @bind-Value="_item.CatalogTypeId" class="form-control">
+                    @foreach (var type in _types)
+                    {
+                        <option value="@type.Id">@type.Type</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Price</label>
+            <div class="col-md-3">
+                <InputNumber @bind-Value="_item.Price" class="form-control" />
+                <ValidationMessage For="() => _item.Price" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Picture name</label>
+            <div class="col-md-4 esh-form-information">
+                Uploading images not allowed for this version.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Stock</label>
+            <div class="col-md-3">
+                <InputNumber @bind-Value="_item.AvailableStock" class="form-control" />
+                <ValidationMessage For="() => _item.AvailableStock" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Restock</label>
+            <div class="col-md-3">
+                <InputNumber @bind-Value="_item.RestockThreshold" class="form-control" />
+                <ValidationMessage For="() => _item.RestockThreshold" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Max stock</label>
+            <div class="col-md-3">
+                <InputNumber @bind-Value="_item.MaxStockThreshold" class="form-control" />
+                <ValidationMessage For="() => _item.MaxStockThreshold" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-3 text-right esh-button-actions">
+                <button type="button" class="btn esh-button esh-button-secondary" @onclick="Cancel">[ Cancel ]</button>
+                <button type="submit" class="btn esh-button esh-button-primary">[ Create ]</button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    private CatalogItem _item = new()
+    {
+        CatalogBrandId = 1,
+        CatalogTypeId = 1,
+    };
+
+    private IReadOnlyList<CatalogBrand> _brands = Array.Empty<CatalogBrand>();
+    private IReadOnlyList<CatalogType> _types = Array.Empty<CatalogType>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _brands = await CatalogService.GetCatalogBrandsAsync();
+        _types = await CatalogService.GetCatalogTypesAsync();
+    }
+
+    private async Task HandleCreateAsync()
+    {
+        await CatalogService.CreateCatalogItemAsync(_item);
+        Navigation.NavigateTo("/");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
