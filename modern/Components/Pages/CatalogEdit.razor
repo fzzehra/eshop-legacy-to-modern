@@ -1,0 +1,150 @@
+@page "/Catalog/Edit/{Id:int}"
+@using EShop.Modern.Models
+@using EShop.Modern.Services
+@inject ICatalogReadService ReadService
+@inject ICatalogService CatalogService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit</PageTitle>
+
+@if (_item is not null)
+{
+    <h2 class="esh-body-title">Edit</h2>
+
+    <div class="container">
+        <div class="row">
+            <img class="col-md-6 esh-picture" src="@($"/Pics/{_item.PictureFileName}")" alt="@_item.Name" />
+            <div class="col-md-6 form-horizontal">
+                <EditForm Model="_item" OnValidSubmit="HandleSaveAsync">
+                    <DataAnnotationsValidator />
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Name</label>
+                        <div class="col-md-8">
+                            <InputText @bind-Value="_item.Name" class="form-control" />
+                            <ValidationMessage For="() => _item.Name" class="field-validation-valid text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Description</label>
+                        <div class="col-md-8">
+                            <InputText @bind-Value="_item.Description" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Brand</label>
+                        <div class="col-md-8">
+                            <InputSelect @bind-Value="_item.CatalogBrandId" class="form-control">
+                                @foreach (var brand in _brands)
+                                {
+                                    <option value="@brand.Id">@brand.Brand</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Type</label>
+                        <div class="col-md-8">
+                            <InputSelect @bind-Value="_item.CatalogTypeId" class="form-control">
+                                @foreach (var type in _types)
+                                {
+                                    <option value="@type.Id">@type.Type</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Price</label>
+                        <div class="col-md-8">
+                            <InputNumber @bind-Value="_item.Price" class="form-control" />
+                            <ValidationMessage For="() => _item.Price" class="text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Picture name</label>
+                        <div class="col-md-8">
+                            <InputText @bind-Value="_item.PictureFileName" ReadOnly="true" title="Not allowed for edition" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Stock</label>
+                        <div class="col-md-8">
+                            <InputNumber @bind-Value="_item.AvailableStock" class="form-control" />
+                            <ValidationMessage For="() => _item.AvailableStock" class="text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Restock</label>
+                        <div class="col-md-8">
+                            <InputNumber @bind-Value="_item.RestockThreshold" class="form-control" />
+                            <ValidationMessage For="() => _item.RestockThreshold" class="text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Max stock</label>
+                        <div class="col-md-8">
+                            <InputNumber @bind-Value="_item.MaxStockThreshold" class="form-control" />
+                            <ValidationMessage For="() => _item.MaxStockThreshold" class="text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12 text-right esh-button-actions">
+                            <button type="button" class="btn esh-button esh-button-secondary" @onclick="Cancel">[ Cancel ]</button>
+                            <button type="submit" class="btn esh-button esh-button-primary">[ Save ]</button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    private CatalogItem? _item;
+    private IReadOnlyList<CatalogBrand> _brands = Array.Empty<CatalogBrand>();
+    private IReadOnlyList<CatalogType> _types = Array.Empty<CatalogType>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _item = await ReadService.GetCatalogItemByIdAsync(Id);
+
+        if (_item is null)
+        {
+            if (HttpContext is not null)
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+            }
+
+            return;
+        }
+
+        _brands = await CatalogService.GetCatalogBrandsAsync();
+        _types = await CatalogService.GetCatalogTypesAsync();
+    }
+
+    private async Task HandleSaveAsync()
+    {
+        await CatalogService.UpdateCatalogItemAsync(_item!);
+        Navigation.NavigateTo("/");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
