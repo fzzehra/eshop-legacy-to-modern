@@ -10,8 +10,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddDbContext<CatalogDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDb")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDb"))); //Birisi CatalogDbContext isterse, ona appsettings.json'daki bağlantı dizesiyle kurulmuş bir SQL Server bağlantısı ver
 builder.Services.AddScoped<ICatalogReadService, CatalogReadService>();
+builder.Services.AddScoped<ICatalogService, CatalogService>();
 
 var app = builder.Build();
 
