@@ -33,6 +33,29 @@ Both tests were performed locally with the same k6 configuration.
 | 95th percentile response time (p95) | 39.86 ms | 12.92 ms |
 | Requests per second | 4.90 | 4.98 |
 
+### 3.1 Legacy Product Details Performance Test
+
+An additional k6 test was performed against the legacy product details page (`/Catalog/Details/1`).
+
+The test used 5 virtual users for 30 seconds and verified both HTTP 200 responses and the presence of the expected product name.
+
+| Metric | Result |
+|---|---:|
+| Total HTTP requests | 150 |
+| Successful checks | 300/300 (100%) |
+| HTTP failure rate | 0% |
+| Average response time | 13.63 ms |
+| Median response time | 10.29 ms |
+| 95th percentile (p95) | 43.69 ms |
+| Maximum response time | 74.92 ms |
+| Requests per second | 4.92 |
+
+All requests completed successfully, and the expected product information was returned.
+
+This result establishes an initial performance baseline for the legacy product details page. A direct comparison with the modern implementation will be performed when the equivalent modern page is available.
+
+**Test script:** `tests/performance/eshop-details.js`
+
 ## 4. Results and Observations
 
 All 150 HTTP requests completed successfully for both applications, with no HTTP failures.
@@ -50,11 +73,12 @@ Therefore, the observed performance difference cannot be attributed solely to th
 ## 5. Limitations
 
 - The tests were executed locally rather than in a production-like environment.
-- Only the home page was tested.
-- Database-backed CRUD operations were not measured.
-- The tested pages do not perform equivalent application functionality.
+- The legacy home page and product details page were tested.
+- The modern application's home page was tested, but its equivalent product details page has not yet been measured.
+- Database-backed create, update, and delete operations were not measured.
+- The legacy and modern home pages do not perform equivalent application functionality.
 - Each virtual user waits one second between requests, limiting the generated request rate.
-- Only one test run per application is documented.
+- Only one test run per scenario is documented.
 - The results do not establish maximum throughput or scalability.
 
 ## 6. Next Steps
@@ -67,6 +91,16 @@ Therefore, the observed performance difference cannot be attributed solely to th
 
 ## 7. Conclusion
 
-The initial k6 tests confirm that both applications successfully handled 150 HTTP requests without failures.
+The initial k6 performance tests were completed successfully for both the legacy ASP.NET Web Forms application and the modern Blazor application.
 
-The modern application showed lower response times in the tested scenario. However, additional testing with equivalent functionality is required before drawing conclusions about the performance benefits of modernization.
+Three test scenarios were measured:
+
+- Legacy catalog listing: 17.59 ms average response time.
+- Legacy product details: 13.63 ms average response time.
+- Modern home page: 3.58 ms average response time.
+
+All scenarios completed 150 HTTP requests without failures.
+
+These measurements provide initial performance baselines. However, the tested legacy and modern pages do not yet represent equivalent workloads.
+
+A reliable comparison of modernization performance improvements will require testing the modern catalog listing and product details pages once they are available.
