@@ -41,28 +41,6 @@ jobs:
           name: playwright-report
           path: tests/e2e/playwright-report
           retention-days: 14
-
-      - name: Debug Blazor (browser console)
-        if: failure()
-        working-directory: tests/e2e
-        run: |
-          node -e "
-          const { chromium } = require('@playwright/test');
-          (async () => {
-            const b = await chromium.launch();
-            const p = await b.newPage();
-            p.on('console', m => console.log('CONSOLE', m.type(), m.text()));
-            p.on('pageerror', e => console.log('PAGEERROR', e.message));
-            p.on('requestfailed', r => console.log('FAILED', r.url(), r.failure() && r.failure().errorText));
-            p.on('response', r => { if (r.status() >= 400) console.log('HTTP', r.status(), r.url()); });
-            p.on('websocket', ws => console.log('WEBSOCKET', ws.url()));
-            await p.goto('http://localhost:8080/Catalog/Create');
-            await p.waitForTimeout(8000);
-            console.log('---- HTML (son kisim) ----');
-            console.log((await p.content()).slice(-1500));
-            await b.close();
-          })();"
-
       - name: Show container logs
         if: failure()
         run: docker compose logs
