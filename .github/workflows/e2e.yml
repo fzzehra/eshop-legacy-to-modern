@@ -42,7 +42,7 @@ jobs:
           path: tests/e2e/playwright-report
           retention-days: 14
 
-            - name: Debug Blazor (browser console)
+      - name: Debug Blazor (browser console)
         if: failure()
         working-directory: tests/e2e
         run: |
