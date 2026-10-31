@@ -5,7 +5,7 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  reporter: 'html',
+    reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'html',
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:50586',
     trace: 'retain-on-failure',
