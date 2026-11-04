@@ -1,10 +1,12 @@
-﻿
 @inherits LayoutComponentBase
 
 <div class="page">
     <header class="site-header">
         <div class="header-container">
-            <a class="site-logo" href="/">eShop</a>
+            <a class="site-logo" href="/">
+                <span class="site-logo-mark">e</span>
+                <span>eShop<small>Catalog manager</small></span>
+            </a>
             <NavMenu />
         </div>
     </header>
@@ -16,7 +18,7 @@
     </main>
 
     <footer class="site-footer">
-        <p>&copy; @DateTime.Now.Year eShop. All rights reserved.</p>
+        <p>&copy; @DateTime.Now.Year eShop · Built with Blazor on .NET 10</p>
     </footer>
 </div>
 

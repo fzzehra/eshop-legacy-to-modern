@@ -31,7 +31,7 @@
                 <dd>@_item.CatalogType?.Type</dd>
 
                 <dt>Price</dt>
-                <dd class="esh-price">@_item.Price.ToString("C", CultureInfo.GetCultureInfo("en-US"))</dd>
+                <dd class="esh-price">@_item.Price.ToString("0.00", CultureInfo.InvariantCulture)</dd>
 
                 <dt>Picture name</dt>
                 <dd>@_item.PictureFileName</dd>
