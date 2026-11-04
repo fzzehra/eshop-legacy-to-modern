@@ -14,8 +14,8 @@
 
     <div class="container">
         <div class="row">
-            <img class="col-md-6 esh-picture" src="@($"/Pics/{_item.PictureFileName}")" alt="@_item.Name" />
-            <div class="col-md-6 form-horizontal">
+            <img class="col-md-4 esh-picture" src="@($"/Pics/{_item.PictureFileName}")" alt="@_item.Name" />
+            <div class="col-md-8 form-horizontal esh-form-two-col">
                 <EditForm Model="_item" OnValidSubmit="HandleSaveAsync">
                     <DataAnnotationsValidator />
 
